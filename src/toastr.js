@@ -79,7 +79,13 @@
       if (toast && ! toast.deleting) { // Avoid clicking when fading out
         toast.deleting = true;
         toast.isOpened = false;
-        $animate.leave(toast.el).then(function() {
+		var leaveClass=toast.scope.options.leaveClass;
+		if(leaveClass){
+			$animate.addClass(toast.el,leaveClass).then(leaveCallback);			
+		}
+		else
+			$animate.leave(toast.el).then(leaveCallback);
+		function leaveCallback() {
           if (toast.scope.options.onHidden) {
             toast.scope.options.onHidden(!!wasClicked, toast);
           }
@@ -96,7 +102,7 @@
             container = null;
             containerDefer = $q.defer();
           }
-        });
+        }
       }
 
       function findToast(toastId) {
@@ -218,7 +224,9 @@
           tapToDismiss: options.tapToDismiss,
           timeOut: options.timeOut,
           titleClass: options.titleClass,
-          toastClass: options.toastClass
+          toastClass: options.toastClass,
+		  enterClass: options.enterClass,
+		  leaveClass: options.leaveClass
         };
 
         if (options.closeButton) {
@@ -265,7 +273,7 @@
       }
 
       function createToastEl(scope) {
-        var angularDomEl = angular.element('<div toast></div>'),
+        var angularDomEl = angular.element('<div toast '+(scope.options.enterClass?'class="'+scope.options.enterClass+'"':'')+'></div>'),
           $compile = $injector.get('$compile');
         return $compile(angularDomEl)(scope);
       }
